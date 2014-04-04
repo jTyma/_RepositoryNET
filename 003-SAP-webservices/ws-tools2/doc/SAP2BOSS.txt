@@ -1,0 +1,69 @@
+SAP2BOSS.asmx
+=============================================================
+
+public void set_cust_cert_nbr(int p_cust_id, int p_cert_type, string p_cert_nbr, out int rc, out string msg)
+
+ - metoda: set_cust_cert_nbr - Rozhraní pro nastavení p_cert_nbr dle cust_id a cert_type
+    Kde - cust_id NUMBER je vstupni parameter 
+        - p_cert_type NUMBER je vstupni parameter - viz. tab 1 - urcuje pro jaky doklad se bude cislo dokladu zadavat
+        - rc int je vystupni parameter - urcuje zda se akce podarila - pokud je 0 je to OK
+        - msg string - v pripade chyby (rc nenulove) vraci popis chyby
+
+        v tabulce 1 CUST_TYPE znamena zda se jedna o obcana (A) nebo firmu (B) je treba
+        nastavovat spravny typ (cert_type) co k tomu patri (dle tabulky)
+        V praxi jse o to ze firma ma jenom ICO a obcan vse ostatni
+
+        tab 1
+        -----
+        cert_type    CUST_TYPE    CERT_TYPE_NAME
+        -----------------------------------------------
+        1            A            PIN
+        2            A            Rodné èíslo
+        3            B            IÈO
+        4            A            Obèanský prùkaz
+        5            A            Øidièský prùkaz
+        6            A            Pas
+
+
+
+
+ - metoda: get_cust_id_by_acct_id - Rozhraní pro získání cust_id na zaklade acct_id 
+
+    Kde - p_acct_id NUMBER je vstupni parameter -
+        - p_cust_id OUT NUMBER je vystupni parameter
+        - rc int je vystupni parameter - urcuje zda se akce podarila - pokud je 0 je to OK
+        - msg string - v pripade chyby (rc nenulove) vraci popis chyby
+
+
+
+
+ - metoda: set_contact_email - Rozhraní pro pro nastaveni emailu zakaznika
+
+    Kde - cust_id NUMBER je vstupni parameter - id zakaznika
+        - email VARCHAR2 je vstupni parameter - email zakaznika ktery chceme nastavit
+        - rc int je vystupni parameter - urcuje zda se akce podarila - pokud je 0 je to OK
+        - msg string - v pripade chyby (rc nenulove) vraci popis chyby
+
+
+
+
+ - metoda: set_contact_psc - Rozhraní pro pro nastaveni psc zakaznika
+    Kde - cust_id NUMBER je vstupni parameter - id zakaznika
+        - email VARCHAR2 je vstupni parameter - psc zakaznika ktery chceme nastavit
+        - rc int je vystupni parameter - urcuje zda se akce podarila - pokud je 0 je to OK
+        - msg string - v pripade chyby (rc nenulove) vraci popis chyby
+
+
+ - metoda: set_cust_type - Rozhraní pro nastaveni typu zakaznika (fyzicka osoba/pravnicka osoba-firma)
+    Kde - cust_id NUMBER je vstupni parameter - id zakaznika
+        - cust_type VARCHAR2 je vstupni parameter - typ zakaznika ktery chceme nastavit fyzicka osoba/pravnicka osoba-firma
+        - rc int je vystupni parameter - urcuje zda se akce podarika - pokud je 0 je to OK
+        - msg string - v pripade chyby (rc nenulove) vraci popis chyby
+
+
+
+=============================================================
+
+Rozhrani bezi na adreshe
+
+  http://adresa/kde/to/bezi/SAP2BOSS.asmx

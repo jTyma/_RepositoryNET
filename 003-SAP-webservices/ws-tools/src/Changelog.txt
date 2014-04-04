@@ -1,0 +1,4 @@
+verze 1.0
+	* zaveden changeLog
+	* zmena logovani z Trace (.NET) na log4net
+

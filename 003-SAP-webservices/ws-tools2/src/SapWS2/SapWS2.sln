@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SapWS2", "SapWS2\SapWS2.csproj", "{B379A43F-CB93-43A5-82BB-38E77AA0AD78}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SapWS.UnitTests", "SapWS.UnitTests\SapWS.UnitTests.csproj", "{23D2B19A-3300-408F-A030-F9E0D1BBA0B6}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B379A43F-CB93-43A5-82BB-38E77AA0AD78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B379A43F-CB93-43A5-82BB-38E77AA0AD78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B379A43F-CB93-43A5-82BB-38E77AA0AD78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B379A43F-CB93-43A5-82BB-38E77AA0AD78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23D2B19A-3300-408F-A030-F9E0D1BBA0B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23D2B19A-3300-408F-A030-F9E0D1BBA0B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23D2B19A-3300-408F-A030-F9E0D1BBA0B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23D2B19A-3300-408F-A030-F9E0D1BBA0B6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

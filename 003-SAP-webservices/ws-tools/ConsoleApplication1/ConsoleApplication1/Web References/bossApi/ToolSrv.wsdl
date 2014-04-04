@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://b-oss.ufon.cz/internalapi" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://b-oss.ufon.cz/internalapi" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://b-oss.ufon.cz/internalapi">
+      <s:element name="SetSubsAttributes">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="cmd" type="tns:ArrayOfAttrCommandInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfAttrCommandInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="AttrCommandInfo" nillable="true" type="tns:AttrCommandInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="AttrCommandInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="msisdn" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="attr_name" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="attr_value" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SetSubsAttributesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SetSubsAttributesResult" type="tns:RcStruct" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="RcStruct">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="rc" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="msg" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="UpdateSubsAttributes">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="msisdn" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sapId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="recWho" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="recMe" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="recSCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateSubsAttributesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdateSubsAttributesResult" type="tns:RcStruct" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="SetSubsAttributesSoapIn">
+    <wsdl:part name="parameters" element="tns:SetSubsAttributes" />
+  </wsdl:message>
+  <wsdl:message name="SetSubsAttributesSoapOut">
+    <wsdl:part name="parameters" element="tns:SetSubsAttributesResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateSubsAttributesSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateSubsAttributes" />
+  </wsdl:message>
+  <wsdl:message name="UpdateSubsAttributesSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateSubsAttributesResponse" />
+  </wsdl:message>
+  <wsdl:portType name="WSToolSoap">
+    <wsdl:operation name="SetSubsAttributes">
+      <wsdl:input message="tns:SetSubsAttributesSoapIn" />
+      <wsdl:output message="tns:SetSubsAttributesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSubsAttributes">
+      <wsdl:input message="tns:UpdateSubsAttributesSoapIn" />
+      <wsdl:output message="tns:UpdateSubsAttributesSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WSToolSoap" type="tns:WSToolSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="SetSubsAttributes">
+      <soap:operation soapAction="http://b-oss.ufon.cz/internalapi/SetSubsAttributes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSubsAttributes">
+      <soap:operation soapAction="http://b-oss.ufon.cz/internalapi/UpdateSubsAttributes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WSTool">
+    <wsdl:port name="WSToolSoap" binding="tns:WSToolSoap">
+      <soap:address location="http://192.168.11.11/boss_api/ToolSrv.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

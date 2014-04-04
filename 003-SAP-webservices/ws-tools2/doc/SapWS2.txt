@@ -1,0 +1,43 @@
+SAP2BOSS.asmx
+=============================================================
+
+ - metoda: get_cust_id_by_acct_id - Rozhraní pro získání cust_id na zaklade acct_id 
+
+	Kde - p_acct_id NUMBER je vstupni parameter -
+	    - p_cust_id OUT NUMBER je vystupni parameter
+	    - rc int je vystupni parameter - urcuje zda se akce podarila - pokud je 0 je to OK
+	    - msg string - v pripade chyby (rc nenulove) vraci popis chyby
+
+
+
+
+ - metoda: set_contact_email - Rozhraní pro pro nastaveni emailu zakaznika
+
+	Kde - cust_id NUMBER je vstupni parameter - id zakaznika
+	    - email VARCHAR2 je vstupni parameter - email zakaznika ktery chceme nastavit
+	    - rc int je vystupni parameter - urcuje zda se akce podarila - pokud je 0 je to OK
+	    - msg string - v pripade chyby (rc nenulove) vraci popis chyby
+
+
+
+
+ - metoda: set_contact_psc - Rozhraní pro pro nastaveni psc zakaznika
+	Kde - cust_id NUMBER je vstupni parameter - id zakaznika
+	    - email VARCHAR2 je vstupni parameter - psc zakaznika ktery chceme nastavit
+	    - rc int je vystupni parameter - urcuje zda se akce podarila - pokud je 0 je to OK
+	    - msg string - v pripade chyby (rc nenulove) vraci popis chyby
+
+
+ - metoda: set_cust_type - Rozhraní pro nastaveni typu zakaznika (fyzicka osoba/pravnicka osoba-firma)
+	Kde - cust_id NUMBER je vstupni parameter - id zakaznika
+	    - cust_type VARCHAR2 je vstupni parameter - typ zakaznika ktery chceme nastavit fyzicka osoba/pravnicka osoba-firma
+	    - rc int je vystupni parameter - urcuje zda se akce podarika - pokud je 0 je to OK
+	    - msg string - v pripade chyby (rc nenulove) vraci popis chyby
+
+
+
+=============================================================
+
+Rozhrani bezi na adreshe
+
+  http://adresa/kde/to/bezi/SAP2BOSS.asmx

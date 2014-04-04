@@ -1,0 +1,87 @@
+Popis funkcí pro synchronní rozhraní BOSS
+=========================================
+
+Pro CRM fáze 3 bylo vytvoøeno SOAP rozhraní obsahující
+tyto funkce:
+
+  * invoces      ... seznam vybraných faktur
+  * prodHistory  ... historie produktu
+
+Jako výchozí zadání byl použit dokument
+
+  RFC3 – Synchronní rozhraní BOSS, CRM - fáze 3 (12746)
+
+Popis funkcí a jejich parametrù:
+
+
+Funkce invoces
+--------------
+
+   identifikace zákazníka (je tøeba zadat buï jedno nebo druhé)
+
+     crmId   ... id zákazníka z CRM
+     acctId  ... èíslo zákaznického úètu 
+
+   filtrovací podmínky
+
+     listType         ... typ výpisu (A - všechno, P - zaplacené, 
+                          D - nezaplacené)
+     dateFrom, dateTo ... omezení datumu vystavení
+     limit            ... omezení poètu (buï zadat omezení na datum nebo 
+                          na poèet)
+     callAppl, auth   ... autorizace volání funkce. V tuto chvíli se nepoužívá
+                          vkládat NULL
+
+   výstupy
+
+     rc, msg     ... výsledek volání (0 ok, msg - popis chyby)
+     resultSize  ... poèet záznamù ve výsledku
+     resultLabel ... popis výsledku (viz specifikace)
+     invoiceList ... seznam faktur ve struktuøe InvoiceInfo
+
+
+   struktura InvoiceInfo
+
+     billNbr     ... èíslo faktury
+     invoiceDate ... datum vystavení
+     dueDate     ... datum splatnosti
+     amount      ... èástka
+     debtAmount  ... aktuální dlužná èástka
+
+
+Funkce prodHistory
+------------------
+
+     prodId ... id produktu (odpovídá subsId)
+
+     callAppl, auth   ... autorizace volání funkce. V tuto chvíli se nepoužívá
+                          vkládat NULL
+
+   výstupy
+
+     rc, msg             ... výsledek volání (0 ok, msg - popis chyby)
+     resultStateCount    ... poèet záznamù ve výsledku
+     prodStateList       ... seznam historie stavu produktù ve struktuøe ProdStateInfo
+     resultParamHisCount ... poèet záznamù ve výsledku
+     paramHisList        ... seznam historie parametrù produktù ve struktuøe ParamHisInfo
+
+
+   struktura ProdStateInfo
+
+     state            ... kod stavu
+     stateName        ... textový popis stavu
+     dateFrom, dateTo ... od kdy do kdy
+
+
+   struktura ParamHisInfo
+
+     attrId           ... id parametru
+     name, value      ... jméno a hodnota parametru
+     dateFrom, dateTo ... od kdy do kdy
+
+
+
+ChangeLog
+
+1.0 lojza (2009-04-29)
+	* pridany atributy ve strukturach ParamHisInfo.attrId a ProdStateInfo.stateName

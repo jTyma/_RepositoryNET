@@ -1,0 +1,41 @@
+Informace o volací jistinì
+==========================
+
+Metoda getCreditLimitInfo
+-------------------------
+
+Tato metoda je urèena ke získání údajù o volacích zálohách.
+
+parametry:
+
+    MSISDN - MSISDN zákazníka
+
+
+Návratové hodnoty:
+
+   0 - vše probìhlo v poøádku
+   cokoliv jiného - interní chyba a podle kódu chyby je potørba se kouknout 
+       do pøíslušné ORACLE procedury
+
+Výstup
+
+Struktura obsahující
+
+    <getCreditLimitInfoResponse xmlns="http://b-oss.ufon.cz/internalapi">
+      <getCreditLimitInfoResult>
+        <rc>int</rc>
+        <msg>string</msg>
+        <clpCharge>string</clpCharge>
+        <enhCreditLimit>string</enhCreditLimit>
+        <spendCreditLimit>string</spendCreditLimit>
+      </getCreditLimitInfoResult>
+    </getCreditLimitInfoResponse>
+
+jednotlivé elementy znamenají:
+
+  rc     - návratová hodnota
+  msg    - pøípadný text návratové hodnoty
+
+  clpCharge        - hodnota credit limitu z pøíslušného creditl limit plánu
+  enhCreditLimit   - hodnota credit limit ze složených depozit
+  spendCreditLimit - provolaná èástka v aktuáním bill cyklu

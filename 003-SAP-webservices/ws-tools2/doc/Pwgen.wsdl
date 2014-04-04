@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://b-oss.ufon.cz/internalapi/pwgen" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://b-oss.ufon.cz/internalapi/pwgen" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://b-oss.ufon.cz/internalapi/pwgen">
+      <s:element name="passwdGen">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="pwType" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="passwdGenResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="passwdGenResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="passwdGenSoapIn">
+    <wsdl:part name="parameters" element="tns:passwdGen" />
+  </wsdl:message>
+  <wsdl:message name="passwdGenSoapOut">
+    <wsdl:part name="parameters" element="tns:passwdGenResponse" />
+  </wsdl:message>
+  <wsdl:portType name="PwGenSoap">
+    <wsdl:operation name="passwdGen">
+      <wsdl:input message="tns:passwdGenSoapIn" />
+      <wsdl:output message="tns:passwdGenSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="PwGenSoap" type="tns:PwGenSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="passwdGen">
+      <soap:operation soapAction="http://b-oss.ufon.cz/internalapi/pwgen/passwdGen" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="PwGenSoap12" type="tns:PwGenSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="passwdGen">
+      <soap12:operation soapAction="http://b-oss.ufon.cz/internalapi/pwgen/passwdGen" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="PwGen">
+    <wsdl:port name="PwGenSoap" binding="tns:PwGenSoap">
+      <soap:address location="http://localhost:1232/PwGen.asmx" />
+    </wsdl:port>
+    <wsdl:port name="PwGenSoap12" binding="tns:PwGenSoap12">
+      <soap12:address location="http://localhost:1232/PwGen.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

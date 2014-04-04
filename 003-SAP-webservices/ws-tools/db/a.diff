@@ -1,0 +1,490 @@
+--- WS_FUNCTIONS-prod-20121126.pck	2012-11-26 14:31:13.841374500 +0100
++++ WS_FUNCTIONS-dev-20121126.pck	2012-11-26 14:31:51.040536500 +0100
+@@ -1,4 +1,4 @@
+-CREATE OR REPLACE PACKAGE "WS_FUNCTIONS" is
++CREATE OR REPLACE PACKAGE "WS_FUNCTIONS_DEV" is
+ 
+   -- Author  : AVI
+   -- Created : 3.6.2008 14:39:54
+@@ -23,6 +23,23 @@
+       p_result OUT NUMBER
+   );
+   
++  PROCEDURE getAcctInfo2
++  (
++      p_acct_id NUMBER, 
++      p_mssidn VARCHAR2, 
++      
++      p_InvNbr            OUT VARCHAR2,
++      p_InvAmount         OUT VARCHAR2,
++      p_InvDueDate        OUT VARCHAR2,
++      p_ActualBalance     OUT VARCHAR2,
++      p_PaymentAmt        OUT VARCHAR2,
++      p_PaymentDate       OUT VARCHAR2,
++      p_BillCycleDateFrom OUT VARCHAR2,
++      p_BillCycleDateTo   OUT VARCHAR2,
++      
++      p_result OUT NUMBER
++  );  
++  
+   procedure GET_PROFILE (in_MSISDN in cc.subs.acc_nbr%TYPE,
+                          in_SUBS_ID in cc.subs.id%TYPE,
+                          p_acct_type out varchar2,
+@@ -61,97 +78,14 @@
+   --
+   FUNCTION activation_date (p_subs_id NUMBER) RETURN DATE;
+   
+-  PROCEDURE apply_contact_phone (
+-    p_acct_id NUMBER, p_msisdn VARCHAR2,
+-    p_acct_id_fixed OUT NUMBER, p_msisdn_fixed OUT VARCHAR2);
+ 
+-end WS_FUNCTIONS;
++end WS_FUNCTIONS_DEV;
+ 
+  
+ 
+  
+ /
+-CREATE OR REPLACE PACKAGE BODY "WS_FUNCTIONS" is
+-
+-  --
+-  -- procedura pro ziskani udaju o stavu FUPKY
+-  --   p_susb_id ... kdo
+-  --   p_is_over_quota ... 1/0 (ano/ne), -1 chyba
+-  --
+-  --   p_fup_day ... kdy se v mesici resetuje FUPka 
+-  --                 > 0  - den v mesici kdy se resetuje
+-  --                 = 0  - nelze takovy den urcit (asi denni limit nebo bez FUPky)
+-  --                 = -1 - chyba
+-  --
+-  --   p_rc     ... zda se to povedlo (0 Ok, jinak chyba)
+-  --
+-  PROCEDURE get_fup_state (p_susb_id NUMBER, p_is_over_quota OUT NUMBER, p_fup_day OUT NUMBER, p_rc OUT NUMBER) IS
+-    l_imsi VARCHAR2 (50);
+-    l_profile_name VARCHAR2 (50);
+-    l_allot_profile_name VARCHAR2 (50);
+-    l_rc NUMBER;
+-    l_msg VARCHAR2 (1000);
+-    l_rx_buff VARCHAR2 (20);
+-  BEGIN
+-    
+-    p_rc := -1;
+-    p_is_over_quota := -1;
+-    p_fup_day := -1;
+-    
+-    -- pohledame IMSI
+-    BEGIN
+-      SELECT sc.imsi INTO l_imsi
+-      FROM cc.subs s
+-      INNER JOIN cc.acc_nbr an on (s.acc_nbr = an.acc_nbr)
+-      INNER JOIN cc.sim_nbr sn on (an.id = sn.acc_nbr_id)
+-      INNER JOIN cc.sim_card sc on (sn.sim_card_id = sc.id)
+-      INNER JOIN cc.prod pr on (pr.id=s.id)
+-      WHERE sn.state = 'A' AND pr.prod_state IN ('A','D','E','H') AND  s.id=p_susb_id;
+-    EXCEPTION
+-      when others then
+-        return;
+-    END;
+-    
+-    -- pokusime se najit v nastavenych FUPkach
+-    BEGIN
+-      SELECT fis.profile_name INTO l_profile_name
+-      FROM mon.fup_imsi_state fis 
+-      WHERE fis.imsi = l_imsi AND (NOT (fis.profile_name IS NULL));
+-    EXCEPTION
+-      when others then
+-        return;    
+-    END;
+-    
+-    -- zeptat se v allotu
+-    begin
+-      mon.fup_control.get_profile (l_imsi, l_allot_profile_name, l_rc, l_msg);
+-    EXCEPTION
+-      when others then
+-        return;    
+-    end;
+-    
+-    IF l_rc <> 0 THEN
+-      return;          
+-    END IF;
+-    
+-    -- je-li  na konci OQ, tak je zafupovanej
+-    IF (upper(substr(l_allot_profile_name, length(l_allot_profile_name)-1, 2)) = 'OQ') THEN
+-      p_is_over_quota := 1;
+-    ELSE
+-      p_is_over_quota := 0;                  
+-    END IF;
+-    
+-    -- den otoceni FUPky (posledni dve cisilice)
+-    l_rx_buff := REGEXP_SUBSTR(l_profile_name, '\d{1,2}$');
+-    IF NOT l_rx_buff IS NULL THEN
+-      p_fup_day := to_number(l_rx_buff);
+-    ELSE
+-      p_fup_day := 0;
+-    END IF;    
+-    
+-    p_rc := 0;
+-  END;  
+-
++CREATE OR REPLACE PACKAGE BODY "WS_FUNCTIONS_DEV" is
+ 
+   --
+   -- funkce na ziskani data aktivace pro dane subs_id
+@@ -191,8 +125,7 @@
+         SELECT pa.exp_date 
+         FROM cc.prod_arch pa
+         WHERE pa.prod_type='M' AND pa.prod_state='H' and pa.id=p_subs_id
+-      );      
+-    
++      );        
+     EXCEPTION 
+       WHEN others THEN
+         l_date := NULL;
+@@ -272,104 +205,6 @@
+     RETURN l_acct_id;
+   END;
+   
+-  
+-  -- TODO doc
+-  PROCEDURE apply_contact_phone (
+-    p_acct_id NUMBER, p_msisdn VARCHAR2,
+-    p_acct_id_fixed OUT NUMBER, p_msisdn_fixed OUT VARCHAR2)
+-  IS
+-    l_opt_part  VARCHAR2(30);
+-    l_misidn_part VARCHAR2(30);
+-    l_new_misidn_part VARCHAR2(30);
+-    l_idx NUMBER;
+-    l_count NUMBER;
+-    l_acct_id NUMBER;
+-  BEGIN
+-    -- zakladni kopirovani
+-    p_acct_id_fixed := p_acct_id;
+-    p_msisdn_fixed := p_msisdn;
+-    
+-    -- pokud se hleda podle cisla, tak overime, zda je to cislo neterminovaneho 
+-    -- produktu a pokud neni, tak zkusime najit nejaky aktivni produkt a tam tonahradit
+-    -- do toho je zde snaha prenest pripadne pretizene parametry
+-    IF NOT (p_msisdn IS NULL) THEN
+-      l_idx := INSTR(p_msisdn, ':');
+-      
+-      IF l_idx > 0 THEN
+-        l_opt_part    := TRIM(SUBSTR (p_msisdn, l_idx +1));
+-        l_misidn_part := TRIM(SUBSTR (p_msisdn, 1, l_idx - 1));
+-      ELSE
+-        l_opt_part := NULL;
+-        l_misidn_part := p_msisdn;
+-      END IF;
+-      
+-      -- pohledame, zda MISIDN je akticni zakaznik
+-      SELECT count(*) INTO l_count
+-      FROM selfcare.v_active_prod p 
+-      WHERE p.acc_nbr = l_misidn_part;
+-      
+-      IF l_count > 0 THEN
+-        -- zadany telefon je aktivni produkt
+-        -- nechame to tak byt
+-        RETURN;
+-      END IF;
+-      
+-      -- neni to aktivni telefon, zkusime kontaktni telefon
+-      l_acct_id := cotact_phone2acct_id (l_misidn_part);
+-      
+-      -- nenaslo se to, nechame to jak to je
+-      IF l_acct_id IS NULL THEN        
+-        RETURN;
+-      END IF;
+-      
+-      -- pokud se to nepta na zadne pretizene parametry, tak
+-      -- pouzijeme ziskane l_acct_id
+-      IF (l_opt_part IS NULL) THEN
+-        p_acct_id_fixed := l_acct_id;
+-        p_msisdn_fixed := NULL;
+-        RETURN;
+-      END IF;
+-      
+-      -- je na tomto acct_id nejaky aktivni produk?
+-      SELECT count(*) INTO l_count
+-      FROM selfcare.v_active_prod p 
+-      WHERE p.acct_id = l_acct_id;
+-      
+-      IF l_count = 0 THEN
+-        -- zadny produkt, nechame to jak to je
+-        RETURN;
+-      END IF;
+-      
+-      IF l_count = 1 THEN
+-        -- jeden produkt, vezmene jeho cialo a pouzijeme jej
+-        SELECT p.acc_nbr INTO l_new_misidn_part
+-        FROM selfcare.v_active_prod p 
+-        WHERE p.acct_id = l_acct_id;
+-        
+-        p_acct_id_fixed := NULL;
+-        p_msisdn_fixed := l_new_misidn_part || ':' || l_opt_part;               
+-        
+-        RETURN;
+-      END IF;
+-      
+-
+-      IF l_count > 1 THEN
+-        -- bereme prvniho, nejcersvejsiho
+-        select acc_nbr INTO l_new_misidn_part
+-        from
+-        (select rownum,p.acc_nbr from selfcare.v_active_prod p
+-        where p.acct_id = l_acct_id
+-        order by created_date desc)
+-        where rownum=1;
+-
+-        p_acct_id_fixed := NULL;
+-        p_msisdn_fixed := l_new_misidn_part || ':' || l_opt_part;               
+-        
+-        RETURN;              
+-      END IF;        
+-    END IF;       
+-  END;
+-  
+   -- =====================================================================
+   -- prevod z cisla na zakanika na cislo uctu zakaznika
+   --
+@@ -420,10 +255,6 @@
+     l_bc_id NUMBER;
+     l_date DATE;
+     l_date2 DATE;
+-    
+-    l_rc NUMBER;
+-    l_oq NUMBER;
+-    l_qday NUMBER;
+   BEGIN
+     
+     IF p_key = 'PAYMENT_METHOD' THEN
+@@ -665,7 +496,7 @@
+         INNER JOIN cc.billing_cycle bc on (bc.billing_cycle_id=b.billing_cycle_id)
+         WHERE b.acct_id = p_acct_id
+       )
+-      WHERE r=1 and pre_balance >=10000; -- prebalance kladne znamena dluh, je to v halerich (> 100 Kc)
++      WHERE r=1 and pre_balance <0;
+ 
+       IF l_count = 0 THEN
+         p_rc := 0;
+@@ -679,35 +510,6 @@
+       
+     END IF;
+     
+-    -- udaje o FUPce
+-    IF p_key = 'FUP' THEN
+-      IF p_subs_id IS NULL THEN
+-        p_rc := 0;
+-        p_value := -1;
+-        RETURN;
+-      END IF;
+-      
+-      get_fup_state(p_subs_id, l_oq, l_qday, l_rc);
+-      
+-      -- nepovedlo se to
+-      IF l_rc <> 0 OR l_oq <0 OR l_qday <0 THEN
+-        p_rc := 0;
+-        p_value := -2;        
+-        RETURN;
+-      END IF;
+-      
+-      IF l_oq > 0 THEN
+-        p_rc := 0;
+-        p_value := l_qday + 100;
+-      ELSE
+-        p_value := l_qday;
+-      END IF;
+-      
+-      RETURN;
+-      
+-      
+-    END IF;
+-    
+ 
+ --select max(ab.created_date) from cc.acct_book ab where ab.acct_book_type IN ('P') and ab.acct_id=222005    
+     
+@@ -830,6 +632,51 @@
+     p_PaymentAmt := l_value;
+     p_result := 0;
+   END;  
++  
++  PROCEDURE getAcctInfo 
++  (
++      p_acct_id NUMBER, 
++      p_mssidn VARCHAR2, 
++      
++      p_InvNbr            OUT VARCHAR2,
++      p_InvAmount         OUT VARCHAR2,
++      p_InvDueDate        OUT VARCHAR2,
++      p_ActualBalance     OUT VARCHAR2,
++      p_PaymentAmt        OUT VARCHAR2,
++      p_PaymentDate       OUT VARCHAR2,
++      p_BillCycleDateFrom OUT VARCHAR2,
++      p_BillCycleDateTo   OUT VARCHAR2,
++      
++      p_result OUT NUMBER
++  ) IS
++  
++    l_acct_id NUMBER;
++    l_msisdn VARCHAR2(20);
++    l_sipo_count NUMBER;
++  BEGIN 
++    -- pohledat options, pokud existuji
++    IF NOT (p_mssidn IS NULL) THEN
++      -- je v telefonim cisle naznak options?
++      IF INSTR (p_mssidn, ':') > 0 THEN
++        getAcctInfo_opt_wrapper(
++          p_mssidn,       
++          p_InvNbr,
++          p_InvAmount,
++          p_InvDueDate,
++          p_ActualBalance,
++          p_PaymentAmt,
++          p_PaymentDate,
++          p_BillCycleDateFrom,
++          p_BillCycleDateTo,      
++          p_result);
++        
++         --RETURN;
++        l_msisdn := SUBSTR (p_mssidn, 0, INSTR (p_mssidn, ':') - 1);
++      ELSE
++        l_msisdn := p_mssidn;
++      END IF;
++    END IF;
++  END;  
+   -- =====================================================================
+   -- funkce pro API getAcctInfo
+   --
+@@ -853,7 +700,7 @@
+   --      -1 ... nenalezen zakaznik
+   --
+   -- =====================================================================
+-  PROCEDURE getAcctInfo 
++  PROCEDURE getAcctInfo2
+   (
+       p_acct_id NUMBER, 
+       p_mssidn VARCHAR2, 
+@@ -871,65 +718,52 @@
+   ) IS
+   
+     l_acct_id NUMBER;
+-    l_acct_id_fixed NUMBER;
+     l_msisdn VARCHAR2(20);
+-    l_msisdn_fixed VARCHAR2(50);
+     l_sipo_count NUMBER;
+   BEGIN 
+-    apply_contact_phone (
+-      p_acct_id, p_mssidn,
+-      l_acct_id_fixed, l_msisdn_fixed);
+---    l_msisdn_fixed := p_mssidn;
+---    l_acct_id_fixed := p_acct_id;
+-    
+-    -- pokud hledame pres
+-  
+-    -- pohledat options, pokud existuji
+-    IF NOT (l_msisdn_fixed IS NULL) THEN
+-      -- je v telefonim cisle naznak options?
+-      IF INSTR (l_msisdn_fixed, ':') > 0 THEN
+-        getAcctInfo_opt_wrapper(
+-          l_msisdn_fixed,       
+-          p_InvNbr,
+-          p_InvAmount,
+-          p_InvDueDate,
+-          p_ActualBalance,
+-          p_PaymentAmt,
+-          p_PaymentDate,
+-          p_BillCycleDateFrom,
+-          p_BillCycleDateTo,      
+-          p_result);
+-        
+-         --RETURN;
+-        l_msisdn := SUBSTR (l_msisdn_fixed, 0, INSTR (l_msisdn_fixed, ':') - 1);
+-      ELSE
+-        l_msisdn := l_msisdn_fixed;
+-      END IF;
+-    END IF;
+-  
++      
+     -- o koho jde
+-    IF (l_acct_id_fixed IS NULL) THEN
+-      l_acct_id := mssidn2acct_id (l_msisdn);
++    IF (p_acct_id IS NULL) THEN
++      -- hledame dle cisla
++      BEGIN
++        SELECT s.acct_id INTO l_acct_id
++        FROM cc.subs s 
++        INNER JOIN cc.prod p ON (p.id=s.id)
++        WHERE p.prod_state IN ('A','D','E','H') AND s.acc_nbr = p_mssidn;
++      EXCEPTION
++        WHEN NO_DATA_FOUND THEN
++          l_acct_id := NULL;
++      END;
++      
++      -- nenaslo se to, zkusime najit dle kontaktino telefonu
++      IF l_acct_id IS NULL THEN
++        IF TRUE THEN
++          l_acct_id := cotact_phone2acct_id (p_mssidn);
++        END IF;
++      END IF;
++
++    
+     ELSE
+       -- zkontrolovat zda zadane acccount id existuje
+       BEGIN
+         SELECT a.id INTO l_acct_id
+         FROM cc.acct a 
+-        WHERE a.id = l_acct_id_fixed;
++        WHERE a.id = p_acct_id;
+       EXCEPTION
+         WHEN NO_DATA_FOUND THEN  
+           l_acct_id := NULL;
+       END;
+     END IF;
+-    
++  
+     IF (l_acct_id IS NULL) THEN
++      /*
+       -- pokud se hledalo pres pretizeby parametr a neco se naslo, tak to neni 
+       -- neuspech (hledani pres kontaktni telefon)
+       IF p_PaymentAmt IS NOT NULL THEN
+         p_result := 0;
+         RETURN;        
+       END IF;
+-      
++      */
+       p_result := -1;
+       RETURN;    
+     END IF;
+@@ -1103,7 +937,7 @@
+           and    cav.cust_id = a.cust_id
+           and    substr(cav.attr_value,-9) = in_MSISDN
+           and    cav1.cust_id = a.cust_id
+-          and    cav1.cust_attr_db_id = 816; -- EXP_CUST_CUSTTYPE
++          and    cav1.cust_attr_db_id = 836;          
+ 
+           exception
+             when no_data_found then
+@@ -1372,8 +1206,8 @@
+   IS
+   BEGIN
+     -- nova verze zapocitavajic SIPO korekce
+-    -- p_due := collection.cc_collection_common.get_due_amount(p_acct_id);
+-    p_due := collection.cp_main.get_actual_due (p_acct_id) / 100;    
++--   p_due := collection.cc_collection_common.get_due_amount(p_acct_id);
++    p_due := collection.cp_main.get_actual_due (p_acct_id) / 100;
+     
+     -- preplatek
+     IF NOT (p_due IS NULL) THEN
+@@ -1384,7 +1218,6 @@
+     
+     p_rc := 0;
+     p_msg := 0;
+---    p_due := 42;
+   EXCEPTION
+     WHEN others THEN
+       p_due := NULL;
+@@ -1393,5 +1226,5 @@
+   END;
+     
+ 
+-end WS_FUNCTIONS;
++end WS_FUNCTIONS_DEV;
+ /

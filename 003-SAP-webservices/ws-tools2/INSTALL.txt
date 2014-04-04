@@ -1,0 +1,27 @@
+Postup instalace
+
+ 1. Databazova cast
+    - zvolit uzivatele
+
+    - dat do nej prislunou package CRMWS_FUNCTIONS
+      src/db/CRMWS_FUNCTIONS.pck
+
+    - nagrantovat prava pokud je potreba (bez toho se package nezkompiluje)
+      src/db/grant-prod.sql
+
+ 2. Pripadne otestovani pomoco NUnit
+
+    - nastavit spojeni s databazi
+      doc/Unit-tests-README.txt
+
+    - spusti testy
+      src/SapWS2/SapWS.UnitTests/bin/Debug/SapWS.UnitTests.dll
+
+ 3. Nakopirovat do zvoleneho weboveho adresare vlastni
+    aplikaci webove sluzby a zkonfigurovat pripojeni k databazi
+
+    Webova sluzba pak bezi na adrese
+
+     http://foo.bar/quix/Boss2XI.asmx
+
+    

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://b-oss.ufon.cz/internalapi" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="http://b-oss.ufon.cz/internalapi" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://b-oss.ufon.cz/internalapi">
+      <s:element name="getAcctInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AcctID" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="MSISDN" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getAcctInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getAcctInfoResult" type="tns:RcAcctInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="RcAcctInfo">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="rc" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="msg" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="invNbr" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="invAmount" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="invDueDate" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="actualBalance" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="paymentAmt" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="paymentDate" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="billCycleDateFrom" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="billCycleDateTo" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="getAcctInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:getAcctInfo" />
+  </wsdl:message>
+  <wsdl:message name="getAcctInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:getAcctInfoResponse" />
+  </wsdl:message>
+  <wsdl:portType name="AcctInfoSoap">
+    <wsdl:operation name="getAcctInfo">
+      <wsdl:input message="tns:getAcctInfoSoapIn" />
+      <wsdl:output message="tns:getAcctInfoSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="AcctInfoSoap" type="tns:AcctInfoSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+    <wsdl:operation name="getAcctInfo">
+      <soap:operation soapAction="http://b-oss.ufon.cz/internalapi/getAcctInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="AcctInfo">
+    <wsdl:port name="AcctInfoSoap" binding="tns:AcctInfoSoap">
+      <soap:address location="http://192.168.1.136/WStolls/AcctInfo.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

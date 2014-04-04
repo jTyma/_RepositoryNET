@@ -1,0 +1,101 @@
+Kontrola hesel 
+==============
+
+Metoda checkPin
+---------------
+
+Tato metoda je urèena k pøímé kontrole hesla.
+
+parametry:
+
+    AcctID - èíslo zákaznického úètu
+    MSISDN - MSISDN
+    pwd    - kontrolovaný pin
+
+Pro zadané zákaznické èíslo se zkontroluje zákaznické heslo.
+Není-li AcctID zadáno, najde se podle MSISDN (aktivní záznam).
+
+Funkce vrací strukturu obsahující èíslo a text (rc a msg). 
+
+Návratové hodnoty:
+
+   0 - kontrola probìhla a heslo neodpovídá
+   1 - kontrola probìhla a heslo odpovídá
+  -1 - k MSISDN se nenašel zákazník
+  -2 - neexistující zákaznícké èíslo
+  
+
+Metoda checkPwdHash
+-------------------
+
+Tato metoda je urèena ke kontrole zahashovaného hesla. Kontrolovat
+se mùže dvìma zpùsoby. Buï se vypoèítá kontrolní hash tak jak je uložený
+v databázi a necha se zkontrolovat, nebo se ješdì jednou zahashuje
+s náhodným prvkem a sdíleným tajmenstvím (pro vyšší bezpeènost
+pøenášených dat).
+
+
+A) pøímá kontrola hashe
+
+Heslo zákazníka se zakóduje pomocí base64 a pak se zahashuje funkcí MD5.
+
+Pøíklad:
+
+  strana klienta
+
+   heslo: 7777
+  base64: Nzc3Nw==
+     md5: decbcbe64d453b322afb9e3879664284
+
+B) varianta s tajemstvím
+
+Z hesla zákazníka se vypožte hodnota hashe (H) jako v bodì A.
+Vygeneruje se náhodné èíslo (S) a z konfigurace se naète tajemství (T).
+Øetìzce S, H a T se spojí a vypoète se z nich kontrolní MD5 (K). K
+ovìøení se zašle náhodné èíslo S a kontrolní øetìzec K.
+
+Na serveru se z atm uloženého tajemství, hodnoty hashe z databáze
+u pøísllušného zákazníka a dodaného náhodného èísla vypoète také kontrolní
+øetìzec a ten se porovná s knotrolním øetìzcem je testován.
+
+Pøíklad
+
+  strana klienta:
+    heslo: 7777
+    base64: Nzc3Nw==
+    md5: decbcbe64d453b322afb9e3879664284
+    tajmenství: heslo
+    náhodný øetìzec: aF67k
+    kontrolní hash: md5(aF67kdecbcbe64d453b322afb9e3879664284heslo) = 72a61bc84fcb489c9d2fd7ada569ff6a
+
+
+  k ovìøení se zasílá:
+    72a61bc84fcb489c9d2fd7ada569ff6a
+    aF67k
+
+  strana serveru:
+    hash hesla z db:decbcbe64d453b322afb9e3879664284
+    tajmenství: heslo
+    náhodný øetìzec z parametrù: aF67k
+    kontrolní hash: md5(aF67kdecbcbe64d453b322afb9e3879664284heslo) = 72a61bc84fcb489c9d2fd7ada569ff6a
+
+
+
+Parametry volání funkce
+
+    AcctID - zákaznické èíslo
+    MSISDN - MSISDN
+    pwdHash- kontrolovaný hash pinu
+    salt   - náhodný øetìzec
+
+Pokud je promìnná salt nevyplòena, tak se použije hash hesla kontroluje pøímo
+podle A). Pokud je zadána hodnota salt, pak se postupuje podle B), pøièemž
+tajemství je uloženo v konfiguraci pod klíèem pwdHashSecret.
+
+  <appSettings>
+    ...
+    <add key="pwdHashSecret"   value="heslo" />
+    ...
+  </appSettings>
+
+Návratové hodnoty jsou stejné jako u checkPin.

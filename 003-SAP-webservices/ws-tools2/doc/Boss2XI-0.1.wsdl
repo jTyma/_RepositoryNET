@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://b-oss.ufon.cz/internalapi/boss2xi" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://b-oss.ufon.cz/internalapi/boss2xi" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://b-oss.ufon.cz/internalapi/boss2xi">
+      <s:element name="invoces">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="crmId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="acctId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="listType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="dateFrom" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="dateTo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="limit" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="callAppl" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="auth" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="invocesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="rc" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="msg" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="resultSize" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="resultLabel" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="invoiceList" type="tns:ArrayOfInvoiceInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfInvoiceInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="InvoiceInfo" nillable="true" type="tns:InvoiceInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="InvoiceInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="billNbr" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="invoiceDate" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="dueDate" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="amount" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="debtAmount" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="prodHistory">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="prodId" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="callAppl" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="auth" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="prodHistoryResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="rc" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="msg" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="resultStateCount" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="prodStateList" type="tns:ArrayOfProdStateInfo" />
+            <s:element minOccurs="1" maxOccurs="1" name="resultParamHisCount" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="paramHisList" type="tns:ArrayOfParamHisInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfProdStateInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ProdStateInfo" nillable="true" type="tns:ProdStateInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ProdStateInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="state" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="dateFrom" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="dateTo" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfParamHisInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ParamHisInfo" nillable="true" type="tns:ParamHisInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ParamHisInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="value" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="dateFrom" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="dateTo" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="invocesSoapIn">
+    <wsdl:part name="parameters" element="tns:invoces" />
+  </wsdl:message>
+  <wsdl:message name="invocesSoapOut">
+    <wsdl:part name="parameters" element="tns:invocesResponse" />
+  </wsdl:message>
+  <wsdl:message name="prodHistorySoapIn">
+    <wsdl:part name="parameters" element="tns:prodHistory" />
+  </wsdl:message>
+  <wsdl:message name="prodHistorySoapOut">
+    <wsdl:part name="parameters" element="tns:prodHistoryResponse" />
+  </wsdl:message>
+  <wsdl:portType name="Boss2XISoap">
+    <wsdl:operation name="invoces">
+      <wsdl:input message="tns:invocesSoapIn" />
+      <wsdl:output message="tns:invocesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="prodHistory">
+      <wsdl:input message="tns:prodHistorySoapIn" />
+      <wsdl:output message="tns:prodHistorySoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Boss2XISoap" type="tns:Boss2XISoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="invoces">
+      <soap:operation soapAction="http://b-oss.ufon.cz/internalapi/boss2xi/invoces" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="prodHistory">
+      <soap:operation soapAction="http://b-oss.ufon.cz/internalapi/boss2xi/prodHistory" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="Boss2XISoap12" type="tns:Boss2XISoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="invoces">
+      <soap12:operation soapAction="http://b-oss.ufon.cz/internalapi/boss2xi/invoces" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="prodHistory">
+      <soap12:operation soapAction="http://b-oss.ufon.cz/internalapi/boss2xi/prodHistory" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Boss2XI">
+    <wsdl:port name="Boss2XISoap" binding="tns:Boss2XISoap">
+      <soap:address location="http://localhost:1232/Boss2XI.asmx" />
+    </wsdl:port>
+    <wsdl:port name="Boss2XISoap12" binding="tns:Boss2XISoap12">
+      <soap12:address location="http://localhost:1232/Boss2XI.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

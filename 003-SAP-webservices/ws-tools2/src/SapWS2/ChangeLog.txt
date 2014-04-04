@@ -1,0 +1,49 @@
+verze 2.1 jtyma (2013-12-12)
+	* SAP2BOSS.asmx - set_cust_cert_nbr - na zaklade cust_id a cert_type nastavi cert_nbr (cislo dokladu) zakaznika
+
+
+verze 2.0 jtyma (2013-12-12)
+	* SAP2BOSS.asmx - set_contact_email - na zaklade cust_id nastavi email zakaznika
+			- set_contact_psc - na zaklade cust_id nastavi psc zakaznika
+			- set_contact_type - na zaklade cust_id nastavi typ zakaznika
+
+verze 1.9 jtyma (2013-12-09)
+	* SAP2BOSS.asmx - get_cust_id_by_acct_id - na zaklade acct_id vraci cust_id
+verze 1.8 lojza (2013-09-06)
+	* GSMResourceInventory.asmx - GetSimInfoByMsisdn - jeste neco pro GSM
+
+verze 1.7 lojza (2013-03-15)
+	* GSMResourceInventory.asmx - jakesi webservice pro GSM
+
+verze 1.6 lojza (2010-12-07)
+	* ActivationParameters.asmx ma novy parametr umoznijici
+	  zapnout "fake rezim" kvuli testu (nic se v databazi 
+	  nevola a negeneruje se chyba) - setActivationParameters.testOnly
+
+
+verze 1.5 lojza (????)
+	* pridano ActivationParameters.asmx - nejake mrdky kvuli SOLUSu
+
+verze 1.4 lojza (????)
+	* upravena nova webova sluzba PrepaidInfo.getMSISDNProfile
+	  (pridano zjsitovani dluhu)
+	* PrepaidInfo.getMSISDNProfile ve vystupu tarifId muze byt
+	  NULL, takze predelano z int na string
+
+verze 1.4 lojza (2009-12-01)
+	* zavenedan nova webova sluzba PrepaidInfo.getMSISDNProfile
+
+verze 1.3 lojza (2009-11-10)
+	* pridan generator hesel 
+
+verze 1.2 lojza (2009-10-26)
+	* zmena formatu cisel v castce z 3,000.00 na 3000.00 
+
+verze 1.1 lojza (2009--29)
+	* preneseno na produkci
+	* doplneny komentare, navod k instalaci atp.
+
+verze 1.0 lojza (2009-04-29)
+	* zaveden ChangeLog
+	* upravy ve WSDL
+	* napsany UnitTesty pro NUnit

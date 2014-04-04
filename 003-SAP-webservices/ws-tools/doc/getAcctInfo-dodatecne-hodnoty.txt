@@ -1,0 +1,99 @@
+Pøetížení návratových hodnot u funkce getAcctInfo
+=================================================
+
+Proè?
+
+  Webová služba getAcctInfo je volána pomocí IVR (plechová huba, automatizovaný 
+  telefonní systém)
+
+  Ten je nastavován pomocí jistého programu (Davos) a v nìm je mimo jiné 
+  zaimplemetováno volání webových služeb. To je tam však udìláno natvrdo
+  a pøidávání parametrù èi jiná modifikace vyžaduje úpravu programu externím 
+  dodavatelem. Nemluvì o vìci jménem SAP XI, která je mezi tím (a pouze 
+  pøeposílá hodnoty) a která také musí být upravena v pøípadì zmìny webové
+  služby.
+
+  Ideální by bylo mít webovou službu, která by mìla jako jeden parametr
+  kód paramatru a jako výstup hodnotu (èi více hodnot) a jakékoliv požadavky
+  na pøidání parametrù by se daly øešit operativnì a bez úèasti externích firem.
+
+  To však nemáme a tak pro zatím to funguje tak, že za telefonní èíslo
+  se pøidají smluvené kódy, které zpùsobí, že místo datumu a èástky poslední
+  platby pøijde v èástce poslední platby požadovaný výsledek.
+
+  Funkce vrací všechny ostatní parametry jako doposud. Pouze pokud je
+  vložen smluvený kód, nevrátí údaje o poslední platbì a místo
+  èástky pøíje výsledek.
+
+
+Pøedávání parametrù:
+
+  Vstupní parametr MSISDN obsahuje èíslo, na které se ptáme
+
+  Za ním mùže následovat znak : a kód
+
+  Existujícví kódy
+  ----------------
+
+    PAYMENT_METHOD - platební metoda zákazníka (DD - inkaso, PR - složenka, BT - bankovní pøevod)
+    SOLD_DEBTOR    - zda se jedná o prodaného dlužníka (Y - ano, N - ne)  
+    UPOMINKA       - zda byla odeslaná upomínka v minulém bill cyklu (Y - ano, N - ne)
+    IS_NEW         - zda bylo aktivováno dneska nebo vèera
+    IS_NEW_15      - zda bylo aktivováno mezi 2 až 15 dny
+    ACTIVE_DAYS    - jak dlouho je èíslo aktivní
+    POZDNI_PLATBA  - zda pøišla platba za poslední fakturu opoždìnì
+    FAKT_DVE_CASTKY- zda podlední faktura obsahova dluh z pøedchozí faktury
+    FUP            - udaj o stavu FUPky - vystupem je cislo
+                        - pokud je zaporne, nepodarilo se FUP zjistit. 
+                        - 0 znamena, nema zakaznik zadnou FUP, nebo se resetuej kazdy den a neni zafupovany
+                        - 100 znamena, ze je zafupovany a resetuje se mu qouta kazdy den
+                        - vetsi nez nula a mensi nez 100 znamena nezafupovaneho zakaznika a cislo
+                          urcuje den, kdy se mu FUP resetuje
+                        - vetsi nez 100 urcuje zakaznika zafupovaneho a den resetace se zjsiti odectenim
+                          stovky
+    CUST_GRP       - v jaké skupinì se zákazník nachází (skupiny pro customer care). Vrací se èíslo (1,2) 
+
+
+    návratová hodnota pøijde v položce 
+
+      paymentAmt
+
+    hodnota paymentDate zùstane prázdná 
+
+
+    Pøíklad:
+
+    790003366:SOLD_DEBTOR 
+
+    vrátí hodnotu N
+
+
+Vyhledávání podle kontatního telefonu
+
+    Èíslo, ze kterého je voláno se hledá v aktivních produktech. Pokud tam není nalezeno, lze
+    zapnou, že se hledá mezi kontaktními èísly. To se provádí dodateèným parametrem
+
+      C
+
+    který je tøeba zapsat pøed (zdùrazòuji pøed) kód s testovanou hodnotou a oddìlit èárkou.
+
+
+    Pøíklad:
+
+      775675692:C,UPOMINKA
+
+    znamená, zda existuje zákazník s produktem 775675692 nebo s tímto kontaktním telefonem 
+    a pokud ano, tak otestovat, zda v minulém bill cyklu nedostal upomínku
+
+
+26.11.2012 - lojza
+  * doplnìn atribut CUST_GRP
+
+1.9.2010 - lojza
+  * doplnena FUPka
+   
+1.3.2010 - lojza
+  * doplnìny parametry a vyhledávání podle kontatu
+
+23.2.2010 - lojza
+   * založen dokument

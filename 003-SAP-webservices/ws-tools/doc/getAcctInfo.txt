@@ -1,0 +1,56 @@
+Informace o accountu
+====================
+
+Metoda getAcctInfo
+---------------
+
+Tato metoda je urèena ke získání údaj§ o úètu z BOSSu
+
+parametry:
+
+    AcctID - èíslo zákaznického úètu
+    MSISDN - MSISDN
+
+Pro zadané zákaznické èíslo se zjišují údaje o útu z BOSSu.
+Není-li AcctID zadáno, najde se podle MSISDN (aktivní záznam).
+
+Návratové hodnoty:
+
+   0 - zákazní se našel a co šlo dohledat se dohledalo
+  -1 - k MSISDN se nenašel zákazník
+
+Vıstup:
+
+Struktura obsahující
+
+    <getAcctInfoResponse xmlns="http://b-oss.ufon.cz/internalapi">
+      <getAcctInfoResult>
+        <rc>int</rc>
+        <msg>string</msg>
+        <invNbr>string</invNbr>
+        <invAmount>string</invAmount>
+        <invDueDate>string</invDueDate>
+        <actualBalance>string</actualBalance>
+        <paymentAmt>string</paymentAmt>
+        <paymentDate>string</paymentDate>
+        <billCycleDateFrom>string</billCycleDateFrom>
+        <billCycleDateTo>string</billCycleDateTo>
+      </getAcctInfoResult>
+    </getAcctInfoResponse>
+
+jednotlivé elementy znamenají:
+
+  rc     - návratová hodnota
+  msg    - text návratové hodnoty
+
+  invNbr     - èíslo poslední faktury 
+  invAmount  - èástka poslední faktury
+  invDueDate - splatnost poslední faktury
+
+  actualBalance - aktuaální nedopaltek/pøeplatek
+  paymentAmt    - poslední platba
+  paymentDate   - datum poslední platby
+
+  billCycleDateFrom - zaèátek aktuálního bill cyklu ke kterému se váe úèet
+  billCycleDateTo   - konec aktuálního bill cyklu ke kterému se váe úèet
+

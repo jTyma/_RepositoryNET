@@ -1,0 +1,155 @@
+
+Popis metod poskytovaných pøes SOAP rozhraní
+============================================
+
+Nastavení anonymního balíèku
+----------------------------
+
+U produktu mohou být nastaveny následující vlastnosti
+
+  * Typ smlouvy
+  * Prodejní kód
+  * ID SAP služby
+  * Doporuèil (prodejní kód)
+  * Doporuèuji koho
+  * Doporuèil mne
+  * U:fonùv promo kód
+
+Pro nastavení vlastností existují dvì funkce. Jedna je urèena
+pro nastavování všech vlastností najednou pro jedeno MSISDN, druhá
+má jako parametr pole struktur s pøíkazem pro nastavení jedné vlastnosti
+na jednom MSISDN. Druhá metoda je vodná spíše pro dávkové nastavení mnoha
+vlastností na rùzných MSISDN.
+
+ 
+Metoda UpdateSubsAttributes
+---------------------------
+
+  parametry
+
+    msisdn - MSISDN (vèetnì prefixu 420)
+    sType  - Typ smlouvy
+    sCode  - Prodejní kód
+    sapId  - ID SAP služby
+    recWho - Doporuèil (prodejní kód)
+    recMe  - Doporuèuji koho
+    recSCode - Doporièil mne
+
+    Pøíklad:
+
+    <UpdateSubsAttributes xmlns="http://b-oss.ufon.cz/internalapi">
+      <msisdn>string</msisdn>
+      <sType>string</sType>
+      <sCode>string</sCode>
+      <sapId>string</sapId>
+      <recWho>string</recWho>
+      <recMe>string</recMe>
+      <recSCode>string</recSCode>
+    </UpdateSubsAttributes>
+
+  Pravidla pro povolené hodnoty parametrù jsou popsány v odstavci
+
+    Oznaèení a validace
+
+  Pokud nìkterá hodnota není zadána, tak je ponechána v pùvodním stavu. 
+  (není smazána).
+
+
+Metoda SetSubsAttributes
+---------------------------
+
+  Tato metoda má jeden  parametr 
+
+    cmd 
+
+  což je pole struktur s pøíkazy na nastavení atributu.
+
+  Strukura se jmenuje AttrCommandInfo a obsahuhe prvky
+
+msisdn - MSISDN
+    attr_name - ozanèení atributu
+    attr_value - hodnota atributu
+
+  Pravidla pro oznaèení a hodnoty atributù jsou posány v odstavci 
+
+    Oznaèení a validace
+
+
+  Pøíklad:
+
+    <SetSubsAttributes xmlns="http://b-oss.ufon.cz/internalapi">
+      <cmd>
+        <AttrCommandInfo>
+          <msisdn>string</msisdn>
+          <attr_name>string</attr_name>
+          <attr_value>string</attr_value>
+        </AttrCommandInfo>
+        <AttrCommandInfo>
+          <msisdn>string</msisdn>
+          <attr_name>string</attr_name>
+          <attr_value>string</attr_value>
+        </AttrCommandInfo>
+      </cmd>
+    </SetSubsAttributes>
+
+
+Oznaèení a validace
+---------------------------
+    
+  Typ smlouvy 
+     STYPE - sType - èíslo 1 až 5
+       1 - 24 mìsícù 
+       2 - bez závazku
+       3 - 36 mìsícù
+       4 - 12 mìsícù
+       5 - 6 mìsícù
+
+
+  Prodejní kód 
+     SCODE - sCode - 6 cifer, 2 písmenka
+     
+  ID SAP služby
+     SAPID - sapId - 10 cifer nebo nula (znak 0)
+
+  Doporuèil (prodejní kód)
+     REC_SCODE - recSCode - 6 cifer, 2 písmenka
+
+  Doporuèuji koho
+     REC_WHO - recWho - 9 cifer
+
+  Doporièil mne
+     REC_ME - recMe - 9 cifer
+
+  U:fonùv promo kód
+     REF_CODE - vstupní hodnota se nijak nevaliduje
+
+
+Návratová hodnota a chybové stavy
+---------------------------------
+
+Funkce vracejí strukturu obsahující kód výsledku a pøípadný popis chyby.
+Je-li kód nula, dopadlo to dobøe, pokud nenulové, vznikla chyba, která je
+blíže popsaná v popisu.
+
+Pøíklad:
+
+    <UpdateSubsAttributesResponse xmlns="http://b-oss.ufon.cz/internalapi">
+      <UpdateSubsAttributesResult>
+        <rc>int</rc>
+        <msg>string</msg>
+      </UpdateSubsAttributesResult>
+    </UpdateSubsAttributesResponse>
+
+    <SetSubsAttributesResponse xmlns="http://b-oss.ufon.cz/internalapi">
+      <SetSubsAttributesResult>
+        <rc>int</rc>
+        <msg>string</msg>
+      </SetSubsAttributesResult>
+    </SetSubsAttributesResponse>
+
+
+Pokud je nastavováno více atributù a u nìkterého se stane chyba, zpracování
+se pøeruší a doposud nastavené atribury se neuloží (rollback transakce).
+
+
+

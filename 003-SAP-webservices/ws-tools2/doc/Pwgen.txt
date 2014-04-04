@@ -1,0 +1,17 @@
+Generator hesel
+===============
+
+Rozhraní pro generování hesel poskytuje jednu funkci
+
+  string passwdGen(int pwType)
+
+Kde pwType je tzp hesla. V tuto chvili existuje pouze
+jenda hodnota a to 
+
+  1 ... heslo po zakaznika, (4 mistny ciselny kod, nebobashujici 
+        prilis trivalni kombinace)
+
+Rozhrani bezi na adreshe
+
+  http://adresa/kde/to/bezi/PwGen.asmx
+
