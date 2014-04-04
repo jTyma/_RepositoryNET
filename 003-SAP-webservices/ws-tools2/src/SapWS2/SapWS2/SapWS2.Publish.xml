@@ -1,0 +1,54 @@
+<publishData>
+  <publishTarget publishUrl="http://localhost/WebService/">
+    <file relUrl="bin/log4net.dll" publishTime="30.3.2006 14:23:58" />
+    <file relUrl="Boss2XI.asmx.cs" publishTime="26.10.2009 15:45:08" />
+    <file relUrl="SubsProfile.asmx" publishTime="5.11.2009 8:49:08" />
+    <file relUrl="Global.asax" publishTime="21.4.2009 13:44:57" />
+    <file relUrl="PrepaidInfo.asmx" publishTime="20.11.2009 14:29:44" />
+    <file relUrl="Properties/AssemblyInfo.cs" publishTime="21.4.2009 9:20:48" />
+    <file relUrl="Web.config" publishTime="15.4.2013 17:19:00" />
+    <file relUrl="SAP2BOSS.asmx.cs" publishTime="18.12.2013 13:15:18" />
+    <file relUrl="SapWS2.Publish.xml" publishTime="20.1.2014 15:52:41" />
+    <file relUrl="GSMResourceInventory.asmx" publishTime="15.4.2013 16:32:46" />
+    <file relUrl="PwGen.asmx" publishTime="30.10.2009 9:07:21" />
+    <file relUrl="SAP2BOSS.asmx" publishTime="9.12.2013 10:05:16" />
+    <file relUrl="ActivationParameters.asmx" publishTime="9.11.2010 10:38:46" />
+    <file relUrl="ActivationParameters.asmx.cs" publishTime="15.4.2013 16:49:19" />
+    <file relUrl="bin/SapWS2.pdb" publishTime="20.1.2014 15:44:52" />
+    <file relUrl="bin/SapWS2.dll" publishTime="20.1.2014 15:44:52" />
+    <file relUrl="GSMResourceInventory.asmx.cs" publishTime="6.9.2013 15:13:41" />
+    <file relUrl="Logs/Log4Net.log" publishTime="3.1.2014 14:52:32" />
+    <file relUrl="PrepaidInfo.asmx.cs" publishTime="9.12.2013 9:08:34" />
+    <file relUrl="SapWS2.csproj.user" publishTime="17.12.2013 10:14:45" />
+    <file relUrl="Boss2XI.asmx" publishTime="21.4.2009 9:28:40" />
+    <file relUrl="Global.asax.cs" publishTime="21.4.2009 13:48:40" />
+    <file relUrl="SubsProfile.asmx.cs" publishTime="5.11.2009 13:11:37" />
+    <file relUrl="PwGen.asmx.cs" publishTime="30.10.2009 9:58:21" />
+    <file relUrl="SapWS2.csproj" publishTime="17.12.2013 10:14:45" />
+  </publishTarget>
+  <publishTarget publishUrl="http://localhost/">
+    <file relUrl="bin/log4net.dll" publishTime="30.3.2006 14:23:58" />
+    <file relUrl="Boss2XI.asmx.cs" publishTime="26.10.2009 15:45:08" />
+    <file relUrl="SubsProfile.asmx" publishTime="5.11.2009 8:49:08" />
+    <file relUrl="SapWS2.csproj.user" publishTime="17.12.2013 10:14:45" />
+    <file relUrl="PrepaidInfo.asmx" publishTime="20.11.2009 14:29:44" />
+    <file relUrl="Properties/AssemblyInfo.cs" publishTime="21.4.2009 9:20:48" />
+    <file relUrl="Web.config" publishTime="15.4.2013 17:19:00" />
+    <file relUrl="SAP2BOSS.asmx.cs" publishTime="18.12.2013 13:15:18" />
+    <file relUrl="GSMResourceInventory.asmx" publishTime="15.4.2013 16:32:46" />
+    <file relUrl="PwGen.asmx" publishTime="30.10.2009 9:07:21" />
+    <file relUrl="SAP2BOSS.asmx" publishTime="9.12.2013 10:05:16" />
+    <file relUrl="ActivationParameters.asmx" publishTime="9.11.2010 10:38:46" />
+    <file relUrl="ActivationParameters.asmx.cs" publishTime="15.4.2013 16:49:19" />
+    <file relUrl="bin/SapWS2.pdb" publishTime="20.1.2014 15:44:52" />
+    <file relUrl="bin/SapWS2.dll" publishTime="20.1.2014 15:44:52" />
+    <file relUrl="GSMResourceInventory.asmx.cs" publishTime="6.9.2013 15:13:41" />
+    <file relUrl="PrepaidInfo.asmx.cs" publishTime="9.12.2013 9:08:34" />
+    <file relUrl="Global.asax" publishTime="21.4.2009 13:44:57" />
+    <file relUrl="Boss2XI.asmx" publishTime="21.4.2009 9:28:40" />
+    <file relUrl="Global.asax.cs" publishTime="21.4.2009 13:48:40" />
+    <file relUrl="SubsProfile.asmx.cs" publishTime="5.11.2009 13:11:37" />
+    <file relUrl="PwGen.asmx.cs" publishTime="30.10.2009 9:58:21" />
+    <file relUrl="SapWS2.csproj" publishTime="17.12.2013 10:14:45" />
+  </publishTarget>
+</publishData>

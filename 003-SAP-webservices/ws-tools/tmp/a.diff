@@ -1,0 +1,193 @@
+--- WS_FUNCTIONS-20100923.pck	2010-09-23 15:33:48.866615000 +0200
++++ WS_FUNCTIONS_DEV2.pck	2010-09-23 18:13:38.073807000 +0200
+@@ -1,4 +1,4 @@
+-CREATE OR REPLACE PACKAGE "WS_FUNCTIONS" is
++CREATE OR REPLACE PACKAGE "WS_FUNCTIONS_DEV2" is
+ 
+   -- Author  : AVI
+   -- Created : 3.6.2008 14:39:54
+@@ -61,12 +61,15 @@
+   --
+   FUNCTION activation_date (p_subs_id NUMBER) RETURN DATE;
+   
++  PROCEDURE apply_contact_phone (
++    p_acct_id NUMBER, p_msisdn VARCHAR2,
++    p_acct_id_fixed OUT NUMBER, p_msisdn_fixed OUT VARCHAR2);
+ 
+-end WS_FUNCTIONS;
++end WS_FUNCTIONS_DEV2;
+ 
+  
+ /
+-CREATE OR REPLACE PACKAGE BODY "WS_FUNCTIONS" is
++CREATE OR REPLACE PACKAGE BODY "WS_FUNCTIONS_DEV2" is
+ 
+   --
+   -- procedura pro ziskani udaju o stavu FUPKY
+@@ -259,6 +262,104 @@
+     RETURN l_acct_id;
+   END;
+   
++  
++  -- TODO doc
++  PROCEDURE apply_contact_phone (
++    p_acct_id NUMBER, p_msisdn VARCHAR2,
++    p_acct_id_fixed OUT NUMBER, p_msisdn_fixed OUT VARCHAR2)
++  IS
++    l_opt_part  VARCHAR2(30);
++    l_misidn_part VARCHAR2(30);
++    l_new_misidn_part VARCHAR2(30);
++    l_idx NUMBER;
++    l_count NUMBER;
++    l_acct_id NUMBER;
++  BEGIN
++    -- zakladni kopirovani
++    p_acct_id_fixed := p_acct_id;
++    p_msisdn_fixed := p_msisdn;
++    
++    -- pokud se hleda podle cisla, tak overime, zda je to cislo neterminovaneho 
++    -- produktu a pokud neni, tak zkusime najit nejaky aktivni produkt a tam tonahradit
++    -- do toho je zde snaha prenest pripadne pretizene parametry
++    IF NOT (p_msisdn IS NULL) THEN
++      l_idx := INSTR(p_msisdn, ':');
++      
++      IF l_idx > 0 THEN
++        l_opt_part    := TRIM(SUBSTR (p_msisdn, l_idx +1));
++        l_misidn_part := TRIM(SUBSTR (p_msisdn, 1, l_idx - 1));
++      ELSE
++        l_opt_part := NULL;
++        l_misidn_part := p_msisdn;
++      END IF;
++      
++      -- pohledame, zda MISIDN je akticni zakaznik
++      SELECT count(*) INTO l_count
++      FROM selfcare.v_active_prod p 
++      WHERE p.acc_nbr = l_misidn_part;
++      
++      IF l_count > 0 THEN
++        -- zadany telefon je aktivni produkt
++        -- nechame to tak byt
++        RETURN;
++      END IF;
++      
++      -- neni to aktivni telefon, zkusime kontaktni telefon
++      l_acct_id := cotact_phone2acct_id (l_misidn_part);
++      
++      -- nenaslo se to, nechame to jak to je
++      IF l_acct_id IS NULL THEN        
++        RETURN;
++      END IF;
++      
++      -- pokud se to nepta na zadne pretizene parametry, tak
++      -- pouzijeme ziskane l_acct_id
++      IF (l_opt_part IS NULL) THEN
++        p_acct_id_fixed := l_acct_id;
++        p_msisdn_fixed := NULL;
++        RETURN;
++      END IF;
++      
++      -- je na tomto acct_id nejaky aktivni produk?
++      SELECT count(*) INTO l_count
++      FROM selfcare.v_active_prod p 
++      WHERE p.acct_id = l_acct_id;
++      
++      IF l_count = 0 THEN
++        -- zadny produkt, nechame to jak to je
++        RETURN;
++      END IF;
++      
++      IF l_count = 1 THEN
++        -- jeden produkt, vezmene jeho cialo a pouzijeme jej
++        SELECT p.acc_nbr INTO l_new_misidn_part
++        FROM selfcare.v_active_prod p 
++        WHERE p.acct_id = l_acct_id;
++        
++        p_acct_id_fixed := NULL;
++        p_msisdn_fixed := l_new_misidn_part || ':' || l_opt_part;               
++        
++        RETURN;
++      END IF;
++      
++
++      IF l_count > 1 THEN
++        -- bereme prvniho, nejcersvejsiho
++        select acc_nbr INTO l_new_misidn_part
++        from
++        (select rownum,p.acc_nbr from selfcare.v_active_prod p
++        where p.acct_id = l_acct_id
++        order by created_date desc)
++        where rownum=1;
++
++        p_acct_id_fixed := NULL;
++        p_msisdn_fixed := l_new_misidn_part || ':' || l_opt_part;               
++        
++        RETURN;              
++      END IF;        
++    END IF;       
++  END;
++  
+   -- =====================================================================
+   -- prevod z cisla na zakanika na cislo uctu zakaznika
+   --
+@@ -760,16 +861,25 @@
+   ) IS
+   
+     l_acct_id NUMBER;
++    l_acct_id_fixed NUMBER;
+     l_msisdn VARCHAR2(20);
++    l_msisdn_fixed VARCHAR2(50);
+     l_sipo_count NUMBER;
+   BEGIN 
++    apply_contact_phone (
++      p_acct_id, p_mssidn,
++      l_acct_id_fixed, l_msisdn_fixed);
++--    l_msisdn_fixed := p_mssidn;
++--    l_acct_id_fixed := p_acct_id;
+     
++    -- pokud hledame pres
++  
+     -- pohledat options, pokud existuji
+-    IF NOT (p_mssidn IS NULL) THEN
++    IF NOT (l_msisdn_fixed IS NULL) THEN
+       -- je v telefonim cisle naznak options?
+-      IF INSTR (p_mssidn, ':') > 0 THEN
++      IF INSTR (l_msisdn_fixed, ':') > 0 THEN
+         getAcctInfo_opt_wrapper(
+-          p_mssidn,       
++          l_msisdn_fixed,       
+           p_InvNbr,
+           p_InvAmount,
+           p_InvDueDate,
+@@ -781,21 +891,21 @@
+           p_result);
+         
+          --RETURN;
+-        l_msisdn := SUBSTR (p_mssidn, 0, INSTR (p_mssidn, ':') - 1);
++        l_msisdn := SUBSTR (l_msisdn_fixed, 0, INSTR (l_msisdn_fixed, ':') - 1);
+       ELSE
+-        l_msisdn := p_mssidn;
++        l_msisdn := l_msisdn_fixed;
+       END IF;
+     END IF;
+   
+     -- o koho jde
+-    IF (p_acct_id IS NULL) THEN
++    IF (l_acct_id_fixed IS NULL) THEN
+       l_acct_id := mssidn2acct_id (l_msisdn);
+     ELSE
+       -- zkontrolovat zda zadane acccount id existuje
+       BEGIN
+         SELECT a.id INTO l_acct_id
+         FROM cc.acct a 
+-        WHERE a.id = p_acct_id;
++        WHERE a.id = l_acct_id_fixed;
+       EXCEPTION
+         WHEN NO_DATA_FOUND THEN  
+           l_acct_id := NULL;
+@@ -1273,5 +1383,5 @@
+   END;
+     
+ 
+-end WS_FUNCTIONS;
++end WS_FUNCTIONS_DEV2;
+ /

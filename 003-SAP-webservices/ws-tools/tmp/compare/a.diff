@@ -1,0 +1,205 @@
+--- WS_FUNCTIONS.pck	2010-09-01 12:21:47.389158500 +0200
++++ WS_FUNCTIONS_DEV.pck	2010-09-01 12:21:41.170169700 +0200
+@@ -1,4 +1,4 @@
+-CREATE OR REPLACE PACKAGE "WS_FUNCTIONS" is
++CREATE OR REPLACE PACKAGE "WS_FUNCTIONS_DEV" is
+ 
+   -- Author  : AVI
+   -- Created : 3.6.2008 14:39:54
+@@ -23,6 +23,23 @@
+       p_result OUT NUMBER
+   );
+   
++  PROCEDURE getAcctInfo2
++  (
++      p_acct_id NUMBER, 
++      p_mssidn VARCHAR2, 
++      
++      p_InvNbr            OUT VARCHAR2,
++      p_InvAmount         OUT VARCHAR2,
++      p_InvDueDate        OUT VARCHAR2,
++      p_ActualBalance     OUT VARCHAR2,
++      p_PaymentAmt        OUT VARCHAR2,
++      p_PaymentDate       OUT VARCHAR2,
++      p_BillCycleDateFrom OUT VARCHAR2,
++      p_BillCycleDateTo   OUT VARCHAR2,
++      
++      p_result OUT NUMBER
++  );  
++  
+   procedure GET_PROFILE (in_MSISDN in cc.subs.acc_nbr%TYPE,
+                          in_SUBS_ID in cc.subs.id%TYPE,
+                          p_acct_type out varchar2,
+@@ -62,11 +79,11 @@
+   FUNCTION activation_date (p_subs_id NUMBER) RETURN DATE;
+   
+ 
+-end WS_FUNCTIONS;
++end WS_FUNCTIONS_DEV;
+ 
+  
+ /
+-CREATE OR REPLACE PACKAGE BODY "WS_FUNCTIONS" is
++CREATE OR REPLACE PACKAGE BODY "WS_FUNCTIONS_DEV" is
+ 
+   --
+   -- funkce na ziskani data aktivace pro dane subs_id
+@@ -606,29 +623,7 @@
+     p_PaymentAmt := l_value;
+     p_result := 0;
+   END;  
+-  -- =====================================================================
+-  -- funkce pro API getAcctInfo
+-  --
+-  -- vstup:
+-  --   p_acct_id ... cislo uctu
+-  --   p_mssidn .... MSISDN
+-  --
+-  -- je treba zadat bud p_mssidn nebo p_acct_id
+-  --
+-  -- vystup:
+-  --   p_InvNbr            cislo posledni faktury
+-  --   p_InvAmount         castka posledni faktury
+-  --   p_InvDueDate        splatnost posledni faktury
+-  --   p_ActualBalance     aktualni vyse dluhu / preplatku
+-  --   p_PaymentAmt        posledni zaznamenana platba
+-  --   p_PaymentDate       datum posledni platby
+-  --   p_BillCycleDateFrom od kdy zacina aktualni billcyklus pro uzivatele
+-  --   p_BillCycleDateTo   do kdy zacina aktualni billcyklus pro uzivatele
+-  --   p_result OUT NUMBER cislo indikujici, zda se to povedlo
+-  --       0 ... v poradku
+-  --      -1 ... nenalezen zakaznik
+-  --
+-  -- =====================================================================
++  
+   PROCEDURE getAcctInfo 
+   (
+       p_acct_id NUMBER, 
+@@ -650,7 +645,6 @@
+     l_msisdn VARCHAR2(20);
+     l_sipo_count NUMBER;
+   BEGIN 
+-    
+     -- pohledat options, pokud existuji
+     IF NOT (p_mssidn IS NULL) THEN
+       -- je v telefonim cisle naznak options?
+@@ -673,10 +667,73 @@
+         l_msisdn := p_mssidn;
+       END IF;
+     END IF;
++  END;  
++  -- =====================================================================
++  -- funkce pro API getAcctInfo
++  --
++  -- vstup:
++  --   p_acct_id ... cislo uctu
++  --   p_mssidn .... MSISDN
++  --
++  -- je treba zadat bud p_mssidn nebo p_acct_id
++  --
++  -- vystup:
++  --   p_InvNbr            cislo posledni faktury
++  --   p_InvAmount         castka posledni faktury
++  --   p_InvDueDate        splatnost posledni faktury
++  --   p_ActualBalance     aktualni vyse dluhu / preplatku
++  --   p_PaymentAmt        posledni zaznamenana platba
++  --   p_PaymentDate       datum posledni platby
++  --   p_BillCycleDateFrom od kdy zacina aktualni billcyklus pro uzivatele
++  --   p_BillCycleDateTo   do kdy zacina aktualni billcyklus pro uzivatele
++  --   p_result OUT NUMBER cislo indikujici, zda se to povedlo
++  --       0 ... v poradku
++  --      -1 ... nenalezen zakaznik
++  --
++  -- =====================================================================
++  PROCEDURE getAcctInfo2
++  (
++      p_acct_id NUMBER, 
++      p_mssidn VARCHAR2, 
++      
++      p_InvNbr            OUT VARCHAR2,
++      p_InvAmount         OUT VARCHAR2,
++      p_InvDueDate        OUT VARCHAR2,
++      p_ActualBalance     OUT VARCHAR2,
++      p_PaymentAmt        OUT VARCHAR2,
++      p_PaymentDate       OUT VARCHAR2,
++      p_BillCycleDateFrom OUT VARCHAR2,
++      p_BillCycleDateTo   OUT VARCHAR2,
++      
++      p_result OUT NUMBER
++  ) IS
+   
++    l_acct_id NUMBER;
++    l_msisdn VARCHAR2(20);
++    l_sipo_count NUMBER;
++  BEGIN 
++      
+     -- o koho jde
+     IF (p_acct_id IS NULL) THEN
+-      l_acct_id := mssidn2acct_id (l_msisdn);
++      -- hledame dle cisla
++      BEGIN
++        SELECT s.acct_id INTO l_acct_id
++        FROM cc.subs s 
++        INNER JOIN cc.prod p ON (p.id=s.id)
++        WHERE p.prod_state IN ('A','D','E','H') AND s.acc_nbr = p_mssidn;
++      EXCEPTION
++        WHEN NO_DATA_FOUND THEN
++          l_acct_id := NULL;
++      END;
++      
++      -- nenaslo se to, zkusime najit dle kontaktino telefonu
++      IF l_acct_id IS NULL THEN
++        IF TRUE THEN
++          l_acct_id := cotact_phone2acct_id (p_mssidn);
++        END IF;
++      END IF;
++
++    
+     ELSE
+       -- zkontrolovat zda zadane acccount id existuje
+       BEGIN
+@@ -688,15 +745,16 @@
+           l_acct_id := NULL;
+       END;
+     END IF;
+-    
++  
+     IF (l_acct_id IS NULL) THEN
++      /*
+       -- pokud se hledalo pres pretizeby parametr a neco se naslo, tak to neni 
+       -- neuspech (hledani pres kontaktni telefon)
+       IF p_PaymentAmt IS NOT NULL THEN
+         p_result := 0;
+         RETURN;        
+       END IF;
+-      
++      */
+       p_result := -1;
+       RETURN;    
+     END IF;
+@@ -1138,7 +1196,9 @@
+   PROCEDURE get_account_debt (p_acct_id NUMBER, p_due OUT NUMBER, p_rc OUT NUMBER, p_msg OUT VARCHAR2)
+   IS
+   BEGIN
+-    p_due := collection.cc_collection_common.get_due_amount(p_acct_id);
++    -- nova verze zapocitavajic SIPO korekce
++--   p_due := collection.cc_collection_common.get_due_amount(p_acct_id);
++    p_due := collection.cp_main.get_actual_due (p_acct_id) / 100;
+     
+     -- preplatek
+     IF NOT (p_due IS NULL) THEN
+@@ -1149,7 +1209,6 @@
+     
+     p_rc := 0;
+     p_msg := 0;
+---    p_due := 42;
+   EXCEPTION
+     WHEN others THEN
+       p_due := NULL;
+@@ -1158,5 +1217,5 @@
+   END;
+     
+ 
+-end WS_FUNCTIONS;
++end WS_FUNCTIONS_DEV;
+ /
